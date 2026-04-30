@@ -131,4 +131,4 @@ LEFT JOIN parks b on a.ZIP = b.ZIP
 INNER JOIN rates c on a.ZIP = c.ZIP
 GROUP BY ZIP;
 
-##Export this dataset to be imported into Tableau.
+##Export this dataset.
