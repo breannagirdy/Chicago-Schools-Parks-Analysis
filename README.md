@@ -7,7 +7,7 @@ As such, in this project, I seek to explore just that. The City of Chicago provi
 
 To begin exploring this data, I executed numerous data-cleaning tactics in Excel in order to prepare for my SQL Exploration. These tasks included:
 
-<b>2024 REPORT CARD PUBLIC DATASET<\b>
+<b>2024 REPORT CARD PUBLIC DATASET</b>
 1. Limiting the data to include schools (1) only in the City of Chicago and (2) under the jurisdiction of Chicago Public Schools (CPS)
 2. Removing irrelevant columns
 3. Replacing empty fields with NULL
