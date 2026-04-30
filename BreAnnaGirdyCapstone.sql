@@ -64,34 +64,6 @@ SELECT *
 FROM report_card_25
 WHERE MATH_PARTICIPATION IS NULL;
 
-##Keep the NULL Values as the missing information can tell us something and potentially provide opportunity for further analysis.
-
-##OBJECTID_1, Park Number, Park info, ZIP, regions
-SELECT *
-FROM parks
-ORDER BY ZIP;
-
-##ELA/Math info, School ID
-SELECT *
-FROM report_card;
-
-##School ID, ZIP, Student Count, Grad Rate.
-SELECT *
-from school_information;
-
-##Using the above information, I now want to start making joins that will result in one table.
-##First, I need to create a CTE from park_data to collect table sums, followed by the same for the school grouping by ZIP.
-##I've added additional lines of code to give me a count of the non-null values in the graduation rate column, as well as
-##the total graduation rate sum to later manually calculate the average per ZIP code. The null values will allow me to name
-##how many schools did not provide data.
-
-##We don't want ZIP Codes without parks. A table that is based on the schools information, joined with parks, where # of parks says 0.
-##ELA/MATH Provided, ELA/MATH SUMS
-##Some schools are not included on the report card.alter
-
-
-##There are more schools listed in the schools_information dataset than the report_card dataset. For acknowledgement purposes, we want to be able to track which schools did/did not report:
-
 ## (1) Adding a REPORTED column and marking all schools in the report_card dataset with y, (2) creating a final dataset containing all relevant school information, and (3) updating the table so that schools that did not appear in the report_card dataset have an 'n' in the REPORTED column.
 ALTER TABLE report_card
 ADD REPORTED varchar(1);
@@ -124,7 +96,7 @@ WHERE REPORTED IS NULL;
 SELECT *
 FROM schools;
 
-##Creating a CTE with temporary rates information so that we can pull the average in a later table that contains all releant park and schools information, as well as a count of schools and students that are not included the reported rates due to the fact that some schools did not have information listed in the report card dataset.
+##Creating a CTE with temporary rates information so that we can pull the average in a later table that contains all relevant park and schools information, as well as a count of schools and students that are not included the reported rates due to the fact that some schools did not have information listed in the report card dataset.
 
 WITH rates AS (
 	SELECT
