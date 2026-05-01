@@ -4,64 +4,24 @@ USE capstone_db;
 
 ##Checking and Addressing Null Values:
 
-##No Null Values in SCHOOL_ID:
-SELECT *
-FROM report_card_25
-WHERE SCHOOL_ID IS NULL;
-
-##No Null Values in SCHOOL_NAME:
-SELECT *
-FROM report_card_25
-WHERE SCHOOL_NAME IS NULL;
-
-##No Null Values in DISTRICT:
-SELECT *
-FROM report_card_25
-WHERE DISTRICT IS NULL;
-
-##No Null Values in CITY:
-SELECT *
-FROM report_card_25
-WHERE CITY IS NULL;
-
-##No Null Values in COUNTY:
-SELECT *
-FROM report_card_25
-WHERE COUNTY IS NULL;
-
-##No Null Values in DISTRICT_TYPE:
-SELECT *
-FROM report_card_25
-WHERE DISTRICT_TYPE IS NULL;
-
-##No Null Values in SCHOOL_TYPE:
-SELECT *
-FROM report_card_25
-WHERE SCHOOL_TYPE IS NULL;
-
-##No Null Values in GRADES_SERVED:
-SELECT *
-FROM report_card_25
-WHERE GRADES_SERVED IS NULL;
-
 ##There are null values in ELA_Proficiency:
 SELECT *
-FROM report_card_25
+FROM report_card
 WHERE ELA_PROFICIENCY IS NULL;
 
 ##There are null values in ELA_Participation:
 SELECT *
-FROM report_card_25
+FROM report_card
 WHERE ELA_PARTICIPATION IS NULL;
 
 ##There are null values in Math_Proficiency:
 SELECT *
-FROM report_card_25
+FROM report_card
 WHERE MATH_PROFICIENCY IS NULL;
 
 ##There are null values in Math_Participation:
 SELECT *
-FROM report_card_25
+FROM report_card
 WHERE MATH_PARTICIPATION IS NULL;
 
 ##Keep the NULL Values as the missing information can tell us something and potentially provide opportunity for further analysis.
@@ -83,12 +43,11 @@ from school_information;
 
 ##We don't want ZIP Codes without parks. A table based on the school's information, joined with parks, where the # of parks is 0. ELA/MATH Provided, ELA/MATH SUMS Some schools are not included on the report card.
 
-
 ##There are more schools listed in the schools_information dataset than the report_card dataset. For acknowledgement purposes, we want to be able to track which schools did/did not report:
 
 ##(1) Adding a REPORTED column and marking all schools in the report_card dataset with y, (2) creating a final dataset containing all relevant school information, and (3) updating the table so that schools that did not appear in the report_card dataset have an 'n' in the REPORTED column.
 
-ALTER TABLESUMS.ort_card
+ALTER TABLE report_card
 ADD REPORTED varchar(1);
 
 UPDATE report_card
@@ -143,8 +102,6 @@ FROM reported;
 SELECT *
 FROM reported_summary;
 
-##Export this table
-
 ##Creating a CTE with temporary rates information so that we can pull the average in a later table that contains all relevant park and schools information, as well as a count of schools and students that are not included the reported rates due to the fact that some schools did not have information listed in the report card dataset.
 
 CREATE TABLE final AS
@@ -168,7 +125,7 @@ WITH rates_totals AS (
 	count(DISTINCT a.OBJECTID_1) as Total_Parks,
     ROUND(sum(a.ACRES), 2) as Total_Acres,
 	count(DISTINCT c.SCHOOL_ID) as Total_Schools,
-    sum(c.STUDENT_COUNT_TOTAL) as Total_Students,
+    sum(DISTINCT c.STUDENT_COUNT_TOTAL) as Total_Students,
     ROUND((b.GRAD_Total / NULLIF(b.GRAD_Provided, 0)), 2) AS Grad_Avg,
     ROUND((b.ELA_Total / NULLIF(b.ELA_prof_provided, 0)), 2) AS ELA_Avg,
     ROUND((b.ELA_Part_Total / NULLIF(b.ELA_Part_provided, 0)), 2) AS ELA_Part_Avg,
@@ -178,6 +135,9 @@ FROM rates_totals b
 LEFT JOIN parks a on a.ZIP = b.ZIP
 JOIN schools c on b.ZIP = c.ZIP
 GROUP BY ZIP;
+
+SELECT *
+FROM final;
 
 SELECT
 	a.ZIP,
