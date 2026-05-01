@@ -29,3 +29,5 @@ In this SQL portion, I consolidated the data to prepare for some Exploratory Dat
 
 <b>PYTHON</b><br/>
 In this Python portion, I performed a bit of EDA to determine any correlation between numerous variables, including Total Students (Reported), Total Parks, Student-to-Park Density, etc.
+
+<b>See Tableau for an [interative dasboard](https://public.tableau.com/views/CityofChicagoParkandStudentDensitieswithSubjectRates/CityofChicagoParkandStudentDensitieswithSubjectRates?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link) of the resulting data!<b>
