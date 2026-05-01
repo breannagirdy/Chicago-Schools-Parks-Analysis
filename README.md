@@ -1,4 +1,4 @@
-# Chicago-Schools-Parks-Analysis
+# Chicago-Parks-and-Schools-Analysis
 With Third Spaces on a decline nationally, cities like Chicago are making an active effort to invest in the propagation of green spaces for their residents. While the topic of "Third Spaces" is often centered on adult experiences and health indicators, publications such as [Park access and mental health among parents and children during the COVID-19 pandemic](https://pmc.ncbi.nlm.nih.gov/articles/PMC9022731/) emphasize the effect of not just the presence of green spaces but their <b>proximity</b> as well:
 
 > Greening schoolyards is an intervention to transform playgrounds into community parks, but this approach has primarily targeted elementary schools. Prior studies indicate improved academic performance and stress response in response to nearby nature on high school campuses [58, 59]. If schoolyard renovations that transform those spaces into community parks also target middle and high schools where youth spend much of their time, these spaces may be an important health resources for adolescents.
