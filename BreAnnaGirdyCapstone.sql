@@ -79,21 +79,16 @@ FROM report_card;
 SELECT *
 from school_information;
 
-##Using the above information, I now want to start making joins that will result in one table.
-##First, I need to create a CTE from park_data to collect table sums, followed by the same for the school grouping by ZIP.
-##I've added additional lines of code to give me a count of the non-null values in the graduation rate column, as well as
-##the total graduation rate sum to later manually calculate the average per ZIP code. The null values will allow me to name
-##how many schools did not provide data.
+##Using the above information, I now want to start making joins that will result in one table. First, I need to create a CTE from park_data to collect table sums, followed by the same for the school grouping by ZIP. I've added additional lines of code to give me a count of the non-null values  in the graduation rate column, as well as the total graduation rate sum, so I can manually calculate the average per ZIP code later. The null values will allow me to name how many schools did not provide data.
 
-##We don't want ZIP Codes without parks. A table that is based on the schools information, joined with parks, where # of parks says 0.
-##ELA/MATH Provided, ELA/MATH SUMS
-##Some schools are not included on the report card.alter
+##We don't want ZIP Codes without parks. A table based on the school's information, joined with parks, where the # of parks is 0. ELA/MATH Provided, ELA/MATH SUMS Some schools are not included on the report card.
 
 
 ##There are more schools listed in the schools_information dataset than the report_card dataset. For acknowledgement purposes, we want to be able to track which schools did/did not report:
 
-## (1) Adding a REPORTED column and marking all schools in the report_card dataset with y, (2) creating a final dataset containing all relevant school information, and (3) updating the table so that schools that did not appear in the report_card dataset have an 'n' in the REPORTED column.
-ALTER TABLE report_card
+##(1) Adding a REPORTED column and marking all schools in the report_card dataset with y, (2) creating a final dataset containing all relevant school information, and (3) updating the table so that schools that did not appear in the report_card dataset have an 'n' in the REPORTED column.
+
+ALTER TABLESUMS.ort_card
 ADD REPORTED varchar(1);
 
 UPDATE report_card
@@ -123,6 +118,7 @@ WHERE REPORTED IS NULL;
 	
 ##Creating a table to keep track of unreported information:
 
+CREATE TABLE reported_summary AS
 WITH reported AS(
 SELECT
 	ZIP,
@@ -135,15 +131,23 @@ GROUP BY ZIP)
 SELECT
 	ZIP,
     total_schools,
+    schools_reported,
     (total_schools - schools_reported) AS schools_unreported,
-    (1 - (schools_reported / total_schools)) AS schools_percent_unreported,
+    ROUND((schools_reported / total_schools) * 100) AS schools_percent_reported,
     total_students,
+    students_reported,
     (total_students - students_reported) AS students_unreported,
-    (1 - (students_reported / total_students )) AS students_percent_unreported
+	ROUND((students_reported / total_students ) * 100) AS students_percent_reported
 FROM reported;
+
+SELECT *
+FROM reported_summary;
+
+##Export this table
 
 ##Creating a CTE with temporary rates information so that we can pull the average in a later table that contains all relevant park and schools information, as well as a count of schools and students that are not included the reported rates due to the fact that some schools did not have information listed in the report card dataset.
 
+CREATE TABLE final AS
 WITH rates_totals AS (
 	SELECT
 		ZIP,
@@ -165,14 +169,34 @@ WITH rates_totals AS (
     ROUND(sum(a.ACRES), 2) as Total_Acres,
 	count(DISTINCT c.SCHOOL_ID) as Total_Schools,
     sum(c.STUDENT_COUNT_TOTAL) as Total_Students,
-    ROUND((b.GRAD_Total / b.GRAD_Provided), 2) AS Grad_Avg,
-    ROUND((b.ELA_Total / b.ELA_prof_provided), 2) AS ELA_Avg,
-    ROUND((b.ELA_Part_Total / b.ELA_Part_provided), 2) AS ELA_Part_Avg,
-    ROUND((b.MATH_Total / b.MATH_prof_provided), 2) AS MATH_Avg,
-    ROUND((b.MATH_Part_Total / b.MATH_Part_provided), 2) AS MATH_Part_Avg
+    ROUND((b.GRAD_Total / NULLIF(b.GRAD_Provided, 0)), 2) AS Grad_Avg,
+    ROUND((b.ELA_Total / NULLIF(b.ELA_prof_provided, 0)), 2) AS ELA_Avg,
+    ROUND((b.ELA_Part_Total / NULLIF(b.ELA_Part_provided, 0)), 2) AS ELA_Part_Avg,
+    ROUND((b.MATH_Total / NULLIF(b.MATH_prof_provided, 0)), 2) AS MATH_Avg,
+    ROUND((b.MATH_Part_Total / NULLIF(b.MATH_Part_provided, 0)), 2) AS MATH_Part_Avg
 FROM rates_totals b
 LEFT JOIN parks a on a.ZIP = b.ZIP
 JOIN schools c on b.ZIP = c.ZIP
 GROUP BY ZIP;
 
-##Export this dataset to be imported into Tableau.
+SELECT
+	a.ZIP,
+	a.Total_Parks,
+    a.Total_Acres,
+	a.Total_Schools,
+    b.schools_reported AS Schools_Reported,
+    b.schools_unreported AS Schools_Unreported,
+    b.schools_percent_reported AS Schools_Percent_Reported,
+    a.Total_Students,
+    b.students_reported AS Students_Reported,
+    b.students_unreported AS Students_Unreported,
+    b.students_percent_reported AS Students_Percent_Reported,
+    a.Grad_Avg,
+    a.ELA_Avg,
+    a.ELA_Part_Avg,
+    a.MATH_Avg,
+    a. MATH_Part_Avg
+FROM final a
+LEFT JOIN reported_summary b ON a.ZIP = b. ZIP;
+
+##Export this dataset.
