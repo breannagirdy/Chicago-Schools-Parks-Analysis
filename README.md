@@ -23,3 +23,9 @@ To begin exploring this data, I executed numerous data-cleaning tactics in Excel
 2. Correcting sequencing for OBJECTID_1
 
 At this stage, the datasets are ready to import into SQL!
+
+<b>SQL</b><br/>
+In this SQL portion, I consolidated the data to prepare for some Exploratory Data Analysis (EDA) in Python.
+
+<b>PYTHON</b><br/>
+In this Python portion, I performed a bit of EDA to determine any correlation between numerous variables, including Total Students (Reported), Total Parks, Student-to-Park Density, etc.
